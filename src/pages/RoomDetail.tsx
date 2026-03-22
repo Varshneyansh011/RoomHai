@@ -138,7 +138,7 @@ const RoomDetail = () => {
                     WhatsApp Owner
                   </Button>
                 </a>
-                <a href={`tel:+${room.ownerPhone}`}>
+                <a href={`tel:+${contactPhone}`}>
                   <Button variant="outline" size="lg" className="w-full">
                     <Phone className="h-5 w-5" />
                     Call Owner

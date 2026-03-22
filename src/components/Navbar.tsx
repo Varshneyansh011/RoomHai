@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Home as HomeIcon } from "lucide-react";
+import { Menu, X, Home as HomeIcon, Shield, LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navLinks = [
   { to: "/", label: "Home" },
@@ -12,6 +13,8 @@ const navLinks = [
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, isAdmin, signOut } = useAuth();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border/50">
@@ -35,7 +38,18 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
-          <Button size="sm" variant="outline">Sign In</Button>
+          {isAdmin && (
+            <Link to="/admin" className="text-sm font-medium text-primary flex items-center gap-1">
+              <Shield className="h-3.5 w-3.5" /> Admin
+            </Link>
+          )}
+          {user ? (
+            <Button size="sm" variant="ghost" onClick={signOut}>
+              <LogOut className="h-4 w-4" /> Logout
+            </Button>
+          ) : (
+            <Button size="sm" variant="outline" onClick={() => navigate("/auth")}>Sign In</Button>
+          )}
         </div>
 
         {/* Mobile toggle */}
@@ -66,7 +80,20 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
-            <Button size="sm" variant="outline" className="mt-2">Sign In</Button>
+            {isAdmin && (
+              <Link to="/admin" onClick={() => setOpen(false)} className="px-4 py-3 rounded-lg text-sm font-medium text-primary flex items-center gap-2">
+                <Shield className="h-4 w-4" /> Admin Panel
+              </Link>
+            )}
+            {user ? (
+              <Button size="sm" variant="ghost" onClick={() => { signOut(); setOpen(false); }} className="mt-2">
+                <LogOut className="h-4 w-4" /> Logout
+              </Button>
+            ) : (
+              <Button size="sm" variant="outline" onClick={() => { navigate("/auth"); setOpen(false); }} className="mt-2">
+                Sign In
+              </Button>
+            )}
           </div>
         </div>
       )}

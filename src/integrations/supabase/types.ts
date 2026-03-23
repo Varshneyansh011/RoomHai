@@ -45,6 +45,7 @@ export type Database = {
           location: string | null
           name: string
           phone: string
+          pincode: string | null
           price: number
           reviewed_at: string | null
           reviewed_by: string | null
@@ -61,6 +62,7 @@ export type Database = {
           location?: string | null
           name: string
           phone: string
+          pincode?: string | null
           price: number
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -77,6 +79,7 @@ export type Database = {
           location?: string | null
           name?: string
           phone?: string
+          pincode?: string | null
           price?: number
           reviewed_at?: string | null
           reviewed_by?: string | null

@@ -19,6 +19,7 @@ const BecomeProvider = () => {
     email: "",
     roomName: "",
     city: "",
+    pincode: "",
     location: "",
     price: "",
     facilities: [] as string[],

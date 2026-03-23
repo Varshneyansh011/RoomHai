@@ -13,6 +13,12 @@ const BecomeProvider = () => {
   const { user } = useAuth();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState("");
+  const plans = [
+    { id: "1month", label: "1 Month", price: 29 },
+    { id: "3months", label: "3 Months", price: 59 },
+    { id: "1year", label: "1 Year", price: 99 },
+  ];
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -38,7 +44,7 @@ const BecomeProvider = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.phone || !form.roomName || !form.city || !form.price) {
+    if (!form.name || !form.phone || !form.roomName || !form.city || !form.price || !selectedPlan) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -156,6 +162,32 @@ const BecomeProvider = () => {
                     </button>
                   ))}
                 </div>
+              </div>
+            </div>
+
+            <div className="bg-card rounded-2xl border border-border p-6">
+              <h2 className="font-semibold mb-4">Choose a Subscription Plan *</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {plans.map((plan) => (
+                  <button
+                    key={plan.id}
+                    type="button"
+                    onClick={() => setSelectedPlan(plan.id)}
+                    className={`relative rounded-xl border-2 p-5 text-center transition-all duration-200 ${
+                      selectedPlan === plan.id
+                        ? "border-primary bg-primary/5 shadow-md shadow-primary/10"
+                        : "border-border bg-background hover:border-primary/40"
+                    }`}
+                  >
+                    {plan.id === "1year" && (
+                      <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+                        BEST VALUE
+                      </span>
+                    )}
+                    <div className="text-sm font-medium text-muted-foreground mb-1">{plan.label}</div>
+                    <div className="text-2xl font-bold">₹{plan.price}</div>
+                  </button>
+                ))}
               </div>
             </div>
 

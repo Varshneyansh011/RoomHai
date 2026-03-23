@@ -134,6 +134,10 @@ const BecomeProvider = () => {
                   </select>
                 </div>
                 <div>
+                  <label className="text-sm font-medium mb-1.5 block">Pin Code</label>
+                  <input type="text" value={form.pincode} onChange={(e) => update("pincode", e.target.value)} maxLength={6} className="w-full h-11 px-4 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="e.g. 400058" />
+                </div>
+                <div>
                   <label className="text-sm font-medium mb-1.5 block">Location / Area</label>
                   <input type="text" value={form.location} onChange={(e) => update("location", e.target.value)} className="w-full h-11 px-4 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="e.g. Andheri West" />
                 </div>

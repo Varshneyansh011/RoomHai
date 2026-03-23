@@ -74,7 +74,7 @@ const Index = () => {
                   setShowSuggestions(true);
                 }}
                 onFocus={() => setShowSuggestions(true)}
-                placeholder="Search rooms by city..."
+                placeholder="Search by city or area..."
                 className="w-full h-14 pl-13 pr-32 rounded-2xl bg-card text-foreground shadow-2xl border-0 focus:outline-none focus:ring-2 focus:ring-accent text-base"
                 style={{ paddingLeft: "3.25rem" }}
               />

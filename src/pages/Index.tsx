@@ -6,7 +6,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { RoomCard } from "@/components/RoomCard";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { rooms, cities, testimonials } from "@/data/rooms";
+import { rooms, cities, locations, testimonials } from "@/data/rooms";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const Index = () => {

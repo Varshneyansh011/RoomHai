@@ -28,6 +28,13 @@ export const cities = [
   "Noida", "Gurgaon", "Chandigarh", "Indore", "Bhopal",
 ];
 
+export const areas = [...new Set(rooms.map((r) => r.area))];
+
+export const locations = [
+  ...cities.map((c) => ({ label: c, type: "city" as const })),
+  ...rooms.map((r) => ({ label: `${r.area}, ${r.city}`, type: "area" as const, area: r.area, city: r.city })),
+].filter((v, i, a) => a.findIndex((t) => t.label === v.label) === i);
+
 export const facilities = [
   "WiFi", "AC", "Food", "Laundry", "Power Backup",
   "Parking", "CCTV", "Gym", "TV", "Attached Bathroom",

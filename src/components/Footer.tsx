@@ -36,9 +36,9 @@ export function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Contact</h4>
             <div className="flex flex-col gap-2 text-sm text-primary-foreground/60">
-              <span>support@roomhai.com</span>
-              <span>+91 98765 43210</span>
-              <span>Mumbai, India</span>
+              <span>roomhai247@gmail.com</span>
+              <span>+91 93355 80253</span>
+              <span>Greater Noida, India</span>
             </div>
           </div>
         </div>

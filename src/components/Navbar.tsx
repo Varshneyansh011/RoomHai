@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, Shield, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import logoImg from "@/assets/logo.jpeg";
+import { ComplaintDialog } from "@/components/ComplaintDialog";
+import { UrgentBookingDialog } from "@/components/UrgentBookingDialog";
 
 const navLinks = [
   { to: "/", label: "Home" },

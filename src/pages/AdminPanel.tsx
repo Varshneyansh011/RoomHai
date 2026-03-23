@@ -69,12 +69,14 @@ const AdminPanel = () => {
 
   const fetchData = async () => {
     setLoadingData(true);
-    const [roomsRes, subsRes] = await Promise.all([
+    const [roomsRes, subsRes, complaintsRes] = await Promise.all([
       supabase.from("rooms").select("*").order("created_at", { ascending: false }),
       supabase.from("provider_submissions").select("*").order("created_at", { ascending: false }),
+      supabase.from("complaints").select("*").order("created_at", { ascending: false }),
     ]);
     if (roomsRes.data) setRooms(roomsRes.data);
     if (subsRes.data) setSubmissions(subsRes.data);
+    if (complaintsRes.data) setComplaints(complaintsRes.data as ComplaintRow[]);
     setLoadingData(false);
   };
 

@@ -111,15 +111,7 @@ export type Database = {
           room_id?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "reviews_room_id_fkey"
-            columns: ["room_id"]
-            isOneToOne: false
-            referencedRelation: "rooms"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       rooms: {
         Row: {

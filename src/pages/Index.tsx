@@ -14,8 +14,8 @@ const Index = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const navigate = useNavigate();
 
-  const filteredCities = useMemo(
-    () => cities.filter((c) => c.toLowerCase().includes(searchQuery.toLowerCase())),
+  const filteredLocations = useMemo(
+    () => locations.filter((l) => l.label.toLowerCase().includes(searchQuery.toLowerCase())),
     [searchQuery]
   );
 

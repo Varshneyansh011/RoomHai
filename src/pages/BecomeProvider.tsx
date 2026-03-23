@@ -19,6 +19,7 @@ const BecomeProvider = () => {
     email: "",
     roomName: "",
     city: "",
+    pincode: "",
     location: "",
     price: "",
     facilities: [] as string[],
@@ -49,6 +50,7 @@ const BecomeProvider = () => {
       room_name: form.roomName,
       city: form.city,
       location: form.location || null,
+      pincode: form.pincode || null,
       price: parseInt(form.price),
       facilities: form.facilities,
       submitted_by: user?.id || null,
@@ -131,6 +133,10 @@ const BecomeProvider = () => {
                     <option value="">Select city</option>
                     {cities.map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1.5 block">Pin Code</label>
+                  <input type="text" value={form.pincode} onChange={(e) => update("pincode", e.target.value)} maxLength={6} className="w-full h-11 px-4 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="e.g. 400058" />
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-1.5 block">Location / Area</label>

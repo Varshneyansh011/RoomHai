@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { ReviewSection } from "@/components/ReviewSection";
 import { rooms } from "@/data/rooms";
 import { useState } from "react";
 

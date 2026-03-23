@@ -44,7 +44,7 @@ const BecomeProvider = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.phone || !form.roomName || !form.city || !form.price) {
+    if (!form.name || !form.phone || !form.roomName || !form.city || !form.price || !selectedPlan) {
       toast.error("Please fill in all required fields");
       return;
     }

@@ -166,7 +166,7 @@ export function ReviewSection({ roomId }: { roomId: string }) {
       }
     } else {
       const { error } = await supabase.from("reviews").insert({
-        room_id: roomId,
+        room_id: roomId as any,
         user_id: user.id,
         rating,
         comment: trimmed || null,

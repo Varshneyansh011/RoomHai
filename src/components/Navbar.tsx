@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, Shield, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import logoImg from "@/assets/logo.jpeg";
+import { ComplaintDialog } from "@/components/ComplaintDialog";
+import { UrgentBookingDialog } from "@/components/UrgentBookingDialog";
 
 const navLinks = [
   { to: "/", label: "Home" },
@@ -41,6 +43,8 @@ export function Navbar() {
               <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
             </svg>
           </a>
+          <ComplaintDialog />
+          <UrgentBookingDialog />
         </div>
 
         {/* Desktop */}

@@ -6,11 +6,11 @@ import { Button } from "@/components/ui/button";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import {
   LayoutDashboard, Home as HomeIcon, List, Users, CheckCircle, XCircle,
-  Plus, Edit, Trash2, LogOut, ArrowLeft, Eye, EyeOff
+  Plus, Edit, Trash2, LogOut, ArrowLeft, Eye, EyeOff, AlertTriangle
 } from "lucide-react";
 import { toast } from "sonner";
 
-type Tab = "overview" | "rooms" | "submissions";
+type Tab = "overview" | "rooms" | "submissions" | "complaints";
 
 interface RoomRow {
   id: string;
@@ -38,12 +38,23 @@ interface SubmissionRow {
   created_at: string;
 }
 
+interface ComplaintRow {
+  id: string;
+  name: string;
+  phone: string;
+  email: string | null;
+  message: string;
+  status: string;
+  created_at: string;
+}
+
 const AdminPanel = () => {
   const { user, isAdmin, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("overview");
   const [rooms, setRooms] = useState<RoomRow[]>([]);
   const [submissions, setSubmissions] = useState<SubmissionRow[]>([]);
+  const [complaints, setComplaints] = useState<ComplaintRow[]>([]);
   const [loadingData, setLoadingData] = useState(true);
 
   useEffect(() => {
@@ -58,12 +69,14 @@ const AdminPanel = () => {
 
   const fetchData = async () => {
     setLoadingData(true);
-    const [roomsRes, subsRes] = await Promise.all([
+    const [roomsRes, subsRes, complaintsRes] = await Promise.all([
       supabase.from("rooms").select("*").order("created_at", { ascending: false }),
       supabase.from("provider_submissions").select("*").order("created_at", { ascending: false }),
+      supabase.from("complaints").select("*").order("created_at", { ascending: false }),
     ]);
     if (roomsRes.data) setRooms(roomsRes.data);
     if (subsRes.data) setSubmissions(subsRes.data);
+    if (complaintsRes.data) setComplaints(complaintsRes.data as ComplaintRow[]);
     setLoadingData(false);
   };
 
@@ -120,12 +133,21 @@ const AdminPanel = () => {
   if (!isAdmin) return null;
 
   const pendingCount = submissions.filter((s) => s.status === "pending").length;
+  const newComplaintsCount = complaints.filter((c) => c.status === "new").length;
   const activeRooms = rooms.filter((r) => r.is_active).length;
+
+  const updateComplaintStatus = async (id: string, status: string) => {
+    const { error } = await supabase.from("complaints").update({ status } as any).eq("id", id);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`Complaint marked as ${status}`);
+    fetchData();
+  };
 
   const tabs = [
     { id: "overview" as Tab, label: "Overview", icon: LayoutDashboard },
     { id: "rooms" as Tab, label: "Rooms", icon: List },
     { id: "submissions" as Tab, label: `Submissions${pendingCount ? ` (${pendingCount})` : ""}`, icon: Users },
+    { id: "complaints" as Tab, label: `Complaints${newComplaintsCount ? ` (${newComplaintsCount})` : ""}`, icon: AlertTriangle },
   ];
 
   return (
@@ -310,6 +332,50 @@ const AdminPanel = () => {
                           </Button>
                           <Button variant="outline" size="sm" onClick={() => updateSubmissionStatus(sub.id, "rejected")}>
                             <XCircle className="h-4 w-4" /> Reject
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </ScrollReveal>
+          )}
+
+          {tab === "complaints" && (
+            <ScrollReveal>
+              <h1 className="text-2xl font-bold mb-6">Complaints</h1>
+              {loadingData ? (
+                <p className="text-muted-foreground">Loading...</p>
+              ) : complaints.length === 0 ? (
+                <p className="text-muted-foreground">No complaints yet.</p>
+              ) : (
+                <div className="space-y-3">
+                  {complaints.map((c) => (
+                    <div key={c.id} className="bg-card rounded-xl border border-border p-5">
+                      <div className="flex items-start justify-between gap-4 mb-3">
+                        <div>
+                          <p className="font-semibold">{c.name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {c.phone}{c.email ? ` · ${c.email}` : ""} · {new Date(c.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <span className={`text-xs px-2.5 py-1 rounded-full font-medium shrink-0 ${
+                          c.status === "new" ? "bg-accent/10 text-accent" :
+                          c.status === "resolved" ? "bg-success/10 text-success" :
+                          "bg-muted text-muted-foreground"
+                        }`}>
+                          {c.status}
+                        </span>
+                      </div>
+                      <p className="text-sm mb-3">{c.message}</p>
+                      {c.status === "new" && (
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={() => updateComplaintStatus(c.id, "resolved")}>
+                            <CheckCircle className="h-4 w-4" /> Resolve
+                          </Button>
+                          <Button variant="outline" size="sm" onClick={() => updateComplaintStatus(c.id, "dismissed")}>
+                            <XCircle className="h-4 w-4" /> Dismiss
                           </Button>
                         </div>
                       )}

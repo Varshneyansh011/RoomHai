@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import {
   LayoutDashboard, Home as HomeIcon, List, Users, CheckCircle, XCircle,
-  Plus, Edit, Trash2, LogOut, ArrowLeft, Eye, EyeOff
+  Plus, Edit, Trash2, LogOut, ArrowLeft, Eye, EyeOff, AlertTriangle
 } from "lucide-react";
 import { toast } from "sonner";
 

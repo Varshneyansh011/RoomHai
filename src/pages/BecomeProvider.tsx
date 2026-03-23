@@ -50,6 +50,7 @@ const BecomeProvider = () => {
       room_name: form.roomName,
       city: form.city,
       location: form.location || null,
+      pincode: form.pincode || null,
       price: parseInt(form.price),
       facilities: form.facilities,
       submitted_by: user?.id || null,

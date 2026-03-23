@@ -122,6 +122,9 @@ const RoomDetail = () => {
                 </div>
               </div>
             </ScrollReveal>
+
+            {/* Reviews */}
+            <ReviewSection roomId={room.id} />
           </div>
 
           {/* Sidebar */}

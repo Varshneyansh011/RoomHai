@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-type Tab = "overview" | "rooms" | "submissions";
+type Tab = "overview" | "rooms" | "submissions" | "complaints";
 
 interface RoomRow {
   id: string;

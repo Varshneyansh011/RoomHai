@@ -6,7 +6,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { RoomCard } from "@/components/RoomCard";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { rooms, cities, testimonials } from "@/data/rooms";
+import { rooms, cities, locations, testimonials } from "@/data/rooms";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const Index = () => {
@@ -14,8 +14,8 @@ const Index = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const navigate = useNavigate();
 
-  const filteredCities = useMemo(
-    () => cities.filter((c) => c.toLowerCase().includes(searchQuery.toLowerCase())),
+  const filteredLocations = useMemo(
+    () => locations.filter((l) => l.label.toLowerCase().includes(searchQuery.toLowerCase())),
     [searchQuery]
   );
 
@@ -74,7 +74,7 @@ const Index = () => {
                   setShowSuggestions(true);
                 }}
                 onFocus={() => setShowSuggestions(true)}
-                placeholder="Search rooms by city..."
+                placeholder="Search by city or area..."
                 className="w-full h-14 pl-13 pr-32 rounded-2xl bg-card text-foreground shadow-2xl border-0 focus:outline-none focus:ring-2 focus:ring-accent text-base"
                 style={{ paddingLeft: "3.25rem" }}
               />
@@ -89,17 +89,23 @@ const Index = () => {
               </Button>
             </div>
 
-            {showSuggestions && searchQuery && filteredCities.length > 0 && (
+            {showSuggestions && searchQuery && filteredLocations.length > 0 && (
               <div className="absolute top-full mt-2 w-full bg-card rounded-xl shadow-xl border border-border overflow-hidden z-20">
-                {filteredCities.slice(0, 6).map((city) => (
+                {filteredLocations.slice(0, 8).map((loc) => (
                   <button
-                    key={city}
+                    key={loc.label}
                     type="button"
-                    onClick={() => handleCitySelect(city)}
+                    onClick={() => {
+                      setShowSuggestions(false);
+                      navigate(`/rooms?city=${encodeURIComponent(loc.type === "area" ? loc.label : loc.label)}`);
+                    }}
                     className="w-full flex items-center gap-3 px-5 py-3 text-left hover:bg-secondary transition-colors"
                   >
                     <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-foreground font-medium">{city}</span>
+                    <div>
+                      <span className="text-foreground font-medium">{loc.label}</span>
+                      <span className="ml-2 text-xs text-muted-foreground capitalize">{loc.type}</span>
+                    </div>
                   </button>
                 ))}
               </div>

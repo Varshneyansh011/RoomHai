@@ -89,17 +89,23 @@ const Index = () => {
               </Button>
             </div>
 
-            {showSuggestions && searchQuery && filteredCities.length > 0 && (
+            {showSuggestions && searchQuery && filteredLocations.length > 0 && (
               <div className="absolute top-full mt-2 w-full bg-card rounded-xl shadow-xl border border-border overflow-hidden z-20">
-                {filteredCities.slice(0, 6).map((city) => (
+                {filteredLocations.slice(0, 8).map((loc) => (
                   <button
-                    key={city}
+                    key={loc.label}
                     type="button"
-                    onClick={() => handleCitySelect(city)}
+                    onClick={() => {
+                      setShowSuggestions(false);
+                      navigate(`/rooms?city=${encodeURIComponent(loc.type === "area" ? loc.label : loc.label)}`);
+                    }}
                     className="w-full flex items-center gap-3 px-5 py-3 text-left hover:bg-secondary transition-colors"
                   >
                     <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-foreground font-medium">{city}</span>
+                    <div>
+                      <span className="text-foreground font-medium">{loc.label}</span>
+                      <span className="ml-2 text-xs text-muted-foreground capitalize">{loc.type}</span>
+                    </div>
                   </button>
                 ))}
               </div>

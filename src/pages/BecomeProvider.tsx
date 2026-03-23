@@ -13,6 +13,12 @@ const BecomeProvider = () => {
   const { user } = useAuth();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState("");
+  const plans = [
+    { id: "1month", label: "1 Month", price: 29 },
+    { id: "3months", label: "3 Months", price: 59 },
+    { id: "1year", label: "1 Year", price: 99 },
+  ];
   const [form, setForm] = useState({
     name: "",
     phone: "",

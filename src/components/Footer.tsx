@@ -43,7 +43,7 @@ export function Footer() {
           </div>
         </div>
         <div className="border-t border-primary-foreground/10 mt-12 pt-8 text-center text-sm text-primary-foreground/40">
-          © {new Date().getFullYear()} ROOM HAI. All rights reserved.
+          © ROOM HAI 2026 | All rights reserved
         </div>
       </div>
     </footer>

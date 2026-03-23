@@ -133,12 +133,21 @@ const AdminPanel = () => {
   if (!isAdmin) return null;
 
   const pendingCount = submissions.filter((s) => s.status === "pending").length;
+  const newComplaintsCount = complaints.filter((c) => c.status === "new").length;
   const activeRooms = rooms.filter((r) => r.is_active).length;
+
+  const updateComplaintStatus = async (id: string, status: string) => {
+    const { error } = await supabase.from("complaints").update({ status } as any).eq("id", id);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`Complaint marked as ${status}`);
+    fetchData();
+  };
 
   const tabs = [
     { id: "overview" as Tab, label: "Overview", icon: LayoutDashboard },
     { id: "rooms" as Tab, label: "Rooms", icon: List },
     { id: "submissions" as Tab, label: `Submissions${pendingCount ? ` (${pendingCount})` : ""}`, icon: Users },
+    { id: "complaints" as Tab, label: `Complaints${newComplaintsCount ? ` (${newComplaintsCount})` : ""}`, icon: AlertTriangle },
   ];
 
   return (

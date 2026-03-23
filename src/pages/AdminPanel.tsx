@@ -38,12 +38,23 @@ interface SubmissionRow {
   created_at: string;
 }
 
+interface ComplaintRow {
+  id: string;
+  name: string;
+  phone: string;
+  email: string | null;
+  message: string;
+  status: string;
+  created_at: string;
+}
+
 const AdminPanel = () => {
   const { user, isAdmin, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("overview");
   const [rooms, setRooms] = useState<RoomRow[]>([]);
   const [submissions, setSubmissions] = useState<SubmissionRow[]>([]);
+  const [complaints, setComplaints] = useState<ComplaintRow[]>([]);
   const [loadingData, setLoadingData] = useState(true);
 
   useEffect(() => {

@@ -24,10 +24,23 @@ const Index = () => {
     navigate(`/rooms?city=${encodeURIComponent(city)}`);
   };
 
+  const handleSuggestionClick = (label: string) => {
+    setSearchQuery(label);
+    setShowSuggestions(false);
+    navigate(`/rooms?city=${encodeURIComponent(label)}`);
+  };
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/rooms?city=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && showSuggestions && filteredLocations.length > 0) {
+      e.preventDefault();
+      handleSuggestionClick(filteredLocations[0].label);
     }
   };
 
@@ -74,7 +87,8 @@ const Index = () => {
                   setShowSuggestions(true);
                 }}
                 onFocus={() => setShowSuggestions(true)}
-                placeholder="Search by city or area..."
+                onKeyDown={handleSearchKeyDown}
+                placeholder="Search by city, area or PG name..."
                 className="w-full h-14 pl-13 pr-32 rounded-2xl bg-card text-foreground shadow-2xl border-0 focus:outline-none focus:ring-2 focus:ring-accent text-base"
                 style={{ paddingLeft: "3.25rem" }}
               />
@@ -91,15 +105,12 @@ const Index = () => {
 
             {showSuggestions && searchQuery && filteredLocations.length > 0 && (
               <div className="absolute top-full mt-2 w-full bg-card rounded-xl shadow-xl border border-border overflow-hidden z-20">
-                {filteredLocations.slice(0, 8).map((loc) => (
+                {filteredLocations.slice(0, 8).map((loc, idx) => (
                   <button
                     key={loc.label}
                     type="button"
-                    onClick={() => {
-                      setShowSuggestions(false);
-                      navigate(`/rooms?city=${encodeURIComponent(loc.type === "area" ? loc.label : loc.label)}`);
-                    }}
-                    className="w-full flex items-center gap-3 px-5 py-3 text-left hover:bg-secondary transition-colors"
+                    onClick={() => handleSuggestionClick(loc.label)}
+                    className={`w-full flex items-center gap-3 px-5 py-3 text-left cursor-pointer hover:bg-accent/20 active:bg-accent/30 transition-colors ${idx === 0 ? 'bg-secondary/50' : ''}`}
                   >
                     <MapPin className="h-4 w-4 text-muted-foreground" />
                     <div>

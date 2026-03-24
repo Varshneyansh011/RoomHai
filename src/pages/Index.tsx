@@ -91,15 +91,12 @@ const Index = () => {
 
             {showSuggestions && searchQuery && filteredLocations.length > 0 && (
               <div className="absolute top-full mt-2 w-full bg-card rounded-xl shadow-xl border border-border overflow-hidden z-20">
-                {filteredLocations.slice(0, 8).map((loc) => (
+                {filteredLocations.slice(0, 8).map((loc, idx) => (
                   <button
                     key={loc.label}
                     type="button"
-                    onClick={() => {
-                      setShowSuggestions(false);
-                      navigate(`/rooms?city=${encodeURIComponent(loc.type === "area" ? loc.label : loc.label)}`);
-                    }}
-                    className="w-full flex items-center gap-3 px-5 py-3 text-left hover:bg-secondary transition-colors"
+                    onClick={() => handleSuggestionClick(loc.label)}
+                    className={`w-full flex items-center gap-3 px-5 py-3 text-left cursor-pointer hover:bg-accent/20 active:bg-accent/30 transition-colors ${idx === 0 ? 'bg-secondary/50' : ''}`}
                   >
                     <MapPin className="h-4 w-4 text-muted-foreground" />
                     <div>

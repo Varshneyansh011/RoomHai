@@ -24,10 +24,23 @@ const Index = () => {
     navigate(`/rooms?city=${encodeURIComponent(city)}`);
   };
 
+  const handleSuggestionClick = (label: string) => {
+    setSearchQuery(label);
+    setShowSuggestions(false);
+    navigate(`/rooms?city=${encodeURIComponent(label)}`);
+  };
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/rooms?city=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && showSuggestions && filteredLocations.length > 0) {
+      e.preventDefault();
+      handleSuggestionClick(filteredLocations[0].label);
     }
   };
 

@@ -4,6 +4,14 @@ import room3 from "@/assets/room-3.jpg";
 import room4 from "@/assets/room-4.jpg";
 import room5 from "@/assets/room-5.jpg";
 import room6 from "@/assets/room-6.jpg";
+import saiPg1 from "@/assets/sai-pg-1.jpg";
+import saiPg2 from "@/assets/sai-pg-2.jpg";
+import saiPg3 from "@/assets/sai-pg-3.jpg";
+import saiPg4 from "@/assets/sai-pg-4.jpg";
+import saiPg5 from "@/assets/sai-pg-5.jpg";
+import saiPg6 from "@/assets/sai-pg-6.jpg";
+import saiPg7 from "@/assets/sai-pg-7.jpg";
+import saiPg8 from "@/assets/sai-pg-8.jpg";
 
 export interface Room {
   id: string;
@@ -161,6 +169,22 @@ export const rooms: Room[] = [
     gender: "unisex",
     type: "PG",
     ownerPhone: "919876543217",
+  },
+  {
+    id: "9",
+    name: "SAI PG",
+    city: "Ghaziabad",
+    area: "Chipiyana, Near ABES Green Park Colony",
+    price: 5000,
+    rating: 4.2,
+    reviews: 0,
+    image: saiPg1,
+    images: [saiPg1, saiPg2, saiPg3, saiPg4, saiPg5, saiPg6, saiPg7, saiPg8],
+    description: "Comfortable and affordable PG near ABES Green Park Colony, Chipiyana, Ghaziabad (PIN 201009). Clean rooms with essential amenities. Ideal for students and working professionals.",
+    facilities: ["WiFi", "Laundry", "Power Backup", "Attached Bathroom"],
+    gender: "boys",
+    type: "PG",
+    ownerPhone: "919335580253",
   },
 ];
 

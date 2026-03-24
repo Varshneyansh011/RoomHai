@@ -175,7 +175,7 @@ export const rooms: Room[] = [
     name: "SAI PG",
     city: "Ghaziabad",
     area: "Chipiyana, Near ABES Green Park Colony",
-    price: 5000,
+    price: 3500,
     rating: 4.2,
     reviews: 0,
     image: saiPg1,

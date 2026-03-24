@@ -170,6 +170,22 @@ export const rooms: Room[] = [
     type: "PG",
     ownerPhone: "919876543217",
   },
+  {
+    id: "9",
+    name: "SAI PG",
+    city: "Ghaziabad",
+    area: "Chipiyana, Near ABES Green Park Colony",
+    price: 5000,
+    rating: 4.2,
+    reviews: 0,
+    image: saiPg1,
+    images: [saiPg1, saiPg2, saiPg3, saiPg4, saiPg5, saiPg6, saiPg7, saiPg8],
+    description: "Comfortable and affordable PG near ABES Green Park Colony, Chipiyana, Ghaziabad (PIN 201009). Clean rooms with essential amenities. Ideal for students and working professionals.",
+    facilities: ["WiFi", "Laundry", "Power Backup", "Attached Bathroom"],
+    gender: "boys",
+    type: "PG",
+    ownerPhone: "919335580253",
+  },
 ];
 
 export const areas = [...new Set(rooms.map((r) => r.area))];

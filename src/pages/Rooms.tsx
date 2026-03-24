@@ -26,8 +26,10 @@ const RoomsPage = () => {
 
   const filtered = useMemo(() => {
     return rooms.filter((room) => {
-      const q = search.toLowerCase();
-      const matchCity = !search || room.city.toLowerCase().includes(q) || room.area.toLowerCase().includes(q) || room.name.toLowerCase().includes(q);
+      const q = search.toLowerCase().trim();
+      const words = q.split(/[\s,]+/).filter(Boolean);
+      const haystack = `${room.city} ${room.area} ${room.name}`.toLowerCase();
+      const matchCity = !q || words.every((w) => haystack.includes(w));
       const matchPrice = room.price >= priceRange[0] && room.price <= priceRange[1];
       const matchFacilities = selectedFacilities.length === 0 || selectedFacilities.every((f) => room.facilities.includes(f));
       const matchGender = !gender || room.gender === gender;

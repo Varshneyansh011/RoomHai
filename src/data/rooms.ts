@@ -4,6 +4,14 @@ import room3 from "@/assets/room-3.jpg";
 import room4 from "@/assets/room-4.jpg";
 import room5 from "@/assets/room-5.jpg";
 import room6 from "@/assets/room-6.jpg";
+import saiPg1 from "@/assets/sai-pg-1.jpg";
+import saiPg2 from "@/assets/sai-pg-2.jpg";
+import saiPg3 from "@/assets/sai-pg-3.jpg";
+import saiPg4 from "@/assets/sai-pg-4.jpg";
+import saiPg5 from "@/assets/sai-pg-5.jpg";
+import saiPg6 from "@/assets/sai-pg-6.jpg";
+import saiPg7 from "@/assets/sai-pg-7.jpg";
+import saiPg8 from "@/assets/sai-pg-8.jpg";
 
 export interface Room {
   id: string;

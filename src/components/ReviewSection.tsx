@@ -118,27 +118,38 @@ export function ReviewSection({ roomId }: { roomId: string }) {
       return;
     }
 
-    const userIds = [...new Set(data.map((r) => r.user_id))];
-    const { data: profiles } = userIds.length
+    const userIds = [...new Set(data.map((review) => review.user_id))];
+    const profilesResult = userIds.length
       ? await supabase.from("profiles").select("user_id, display_name").in("user_id", userIds)
-      : { data: [] };
+      : { data: [] as Array<{ user_id: string; display_name: string | null }> };
 
-    const profileMap = new Map(profiles?.map((p) => [p.user_id, p]) || []);
-    const enriched = data.map((r) => ({
-      ...r,
-      profile: profileMap.get(r.user_id) || { display_name: null },
+    const profileMap = new Map<string, { display_name: string | null }>(
+      (profilesResult.data ?? []).map(
+        (profile): [string, { display_name: string | null }] => [
+          profile.user_id,
+          { display_name: profile.display_name },
+        ]
+      )
+    );
+
+    const enriched: Review[] = data.map((review) => ({
+      ...review,
+      profile: profileMap.get(review.user_id) ?? { display_name: null },
     }));
 
     setReviews(enriched);
 
-    const mine = user ? enriched.find((r) => r.user_id === user.id) : null;
-    setExistingReview(mine || null);
-    setRating(mine?.rating || 0);
-    setComment(mine?.comment || "");
+    const mine = user ? enriched.find((review) => review.user_id === user.id) ?? null : null;
+    setExistingReview(mine);
+    setRating(mine?.rating ?? 0);
+    setComment(mine?.comment ?? "");
     setLoading(false);
   };
 
   useEffect(() => {
+    setExistingReview(null);
+    setRating(0);
+    setComment("");
     fetchReviews();
   }, [roomId, user]);
 

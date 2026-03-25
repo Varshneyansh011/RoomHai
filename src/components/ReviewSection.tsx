@@ -140,7 +140,10 @@ export function ReviewSection({ roomId }: { roomId: string }) {
   }, [roomId, user]);
 
   const handleSubmit = async () => {
-    if (!user) return;
+    if (!user) {
+      toast.error("Please sign in to leave a review");
+      return;
+    }
     if (rating === 0) {
       toast.error("Please select a rating");
       return;
@@ -153,37 +156,47 @@ export function ReviewSection({ roomId }: { roomId: string }) {
 
     setSubmitting(true);
 
-    if (existingReview) {
-      const { error } = await supabase
-        .from("reviews")
-        .update({ rating, comment: trimmed || null })
-        .eq("id", existingReview.id);
-      if (error) {
-        console.error("Review update error:", error);
-      } else {
-        toast.success("Review updated!");
-        fetchReviews();
-      }
-    } else {
-      const { error } = await supabase.from("reviews").insert({
-        room_id: roomId,
-        user_id: user.id,
-        rating,
-        comment: trimmed || null,
-      });
-      if (error) {
-        console.error("Review insert error:", error);
-        if (error.code === "23505") {
-          toast.error("You've already reviewed this room");
+    try {
+      if (existingReview) {
+        const { error } = await supabase
+          .from("reviews")
+          .update({ rating, comment: trimmed || null })
+          .eq("id", existingReview.id);
+        if (error) {
+          console.error("Review update error:", error);
+          toast.error("Failed to update: " + error.message);
         } else {
-          toast.error("Failed to submit review");
+          toast.success("Review updated!");
+          await fetchReviews();
         }
       } else {
-        toast.success("Review submitted!");
-        fetchReviews();
+        const { error } = await supabase.from("reviews").insert({
+          room_id: roomId,
+          user_id: user.id,
+          rating,
+          comment: trimmed || null,
+        });
+        if (error) {
+          console.error("Review insert error:", error);
+          if (error.code === "23505") {
+            toast.error("You've already reviewed this room");
+            await fetchReviews();
+          } else {
+            toast.error("Failed to submit: " + error.message);
+          }
+        } else {
+          toast.success("Review submitted!");
+          setRating(0);
+          setComment("");
+          await fetchReviews();
+        }
       }
+    } catch (err) {
+      console.error("Unexpected review error:", err);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
-    setSubmitting(false);
   };
 
   const avgRating =

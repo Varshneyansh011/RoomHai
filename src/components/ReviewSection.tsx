@@ -101,41 +101,55 @@ export function ReviewSection({ roomId }: { roomId: string }) {
   const [existingReview, setExistingReview] = useState<Review | null>(null);
 
   const fetchReviews = async () => {
+    setLoading(true);
+
     const { data } = await supabase
       .from("reviews")
       .select("*")
       .eq("room_id", roomId)
       .order("created_at", { ascending: false });
 
-    if (data) {
-      // Fetch display names for all reviewers
-      const userIds = [...new Set(data.map((r) => r.user_id))];
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("user_id, display_name")
-        .in("user_id", userIds);
-
-      const profileMap = new Map(profiles?.map((p) => [p.user_id, p]) || []);
-      const enriched = data.map((r) => ({
-        ...r,
-        profile: profileMap.get(r.user_id) || { display_name: null },
-      }));
-
-      setReviews(enriched);
-
-      if (user) {
-        const mine = enriched.find((r) => r.user_id === user.id);
-        if (mine) {
-          setExistingReview(mine);
-          setRating(mine.rating);
-          setComment(mine.comment || "");
-        }
-      }
+    if (!data) {
+      setReviews([]);
+      setExistingReview(null);
+      setRating(0);
+      setComment("");
+      setLoading(false);
+      return;
     }
+
+    const userIds = [...new Set(data.map((review) => review.user_id))];
+    const profilesResult = userIds.length
+      ? await supabase.from("profiles").select("user_id, display_name").in("user_id", userIds)
+      : { data: [] as Array<{ user_id: string; display_name: string | null }> };
+
+    const profileMap = new Map<string, { display_name: string | null }>(
+      (profilesResult.data ?? []).map(
+        (profile): [string, { display_name: string | null }] => [
+          profile.user_id,
+          { display_name: profile.display_name },
+        ]
+      )
+    );
+
+    const enriched: Review[] = data.map((review) => ({
+      ...review,
+      profile: profileMap.get(review.user_id) ?? { display_name: null },
+    }));
+
+    setReviews(enriched);
+
+    const mine = user ? enriched.find((review) => review.user_id === user.id) ?? null : null;
+    setExistingReview(mine);
+    setRating(mine?.rating ?? 0);
+    setComment(mine?.comment ?? "");
     setLoading(false);
   };
 
   useEffect(() => {
+    setExistingReview(null);
+    setRating(0);
+    setComment("");
     fetchReviews();
   }, [roomId, user]);
 

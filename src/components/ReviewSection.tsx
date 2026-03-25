@@ -159,19 +159,20 @@ export function ReviewSection({ roomId }: { roomId: string }) {
         .update({ rating, comment: trimmed || null })
         .eq("id", existingReview.id);
       if (error) {
-        toast.error("Failed to update review");
+        console.error("Review update error:", error);
       } else {
         toast.success("Review updated!");
         fetchReviews();
       }
     } else {
       const { error } = await supabase.from("reviews").insert({
-        room_id: roomId as any,
+        room_id: roomId,
         user_id: user.id,
         rating,
         comment: trimmed || null,
       });
       if (error) {
+        console.error("Review insert error:", error);
         if (error.code === "23505") {
           toast.error("You've already reviewed this room");
         } else {

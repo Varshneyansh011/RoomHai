@@ -103,47 +103,62 @@ export function ReviewSection({ roomId }: { roomId: string }) {
   const fetchReviews = async () => {
     setLoading(true);
 
-    const { data } = await supabase
-      .from("reviews")
-      .select("*")
-      .eq("room_id", roomId)
-      .order("created_at", { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from("reviews")
+        .select("*")
+        .eq("room_id", roomId)
+        .order("created_at", { ascending: false });
 
-    if (!data) {
-      setReviews([]);
-      setExistingReview(null);
-      setRating(0);
-      setComment("");
+      if (error) {
+        console.error("Fetch reviews error:", error);
+        setReviews([]);
+        setExistingReview(null);
+        setRating(0);
+        setComment("");
+        return;
+      }
+
+      if (!data) {
+        setReviews([]);
+        setExistingReview(null);
+        setRating(0);
+        setComment("");
+        return;
+      }
+
+      const userIds = [...new Set(data.map((review) => review.user_id))];
+      const profilesResult = userIds.length
+        ? await supabase.from("profiles").select("user_id, display_name").in("user_id", userIds)
+        : { data: [] as Array<{ user_id: string; display_name: string | null }>, error: null };
+
+      if (profilesResult.error) {
+        console.error("Fetch reviewer profiles error:", profilesResult.error);
+      }
+
+      const profileMap = new Map<string, { display_name: string | null }>(
+        (profilesResult.data ?? []).map(
+          (profile): [string, { display_name: string | null }] => [
+            profile.user_id,
+            { display_name: profile.display_name },
+          ]
+        )
+      );
+
+      const enriched: Review[] = data.map((review) => ({
+        ...review,
+        profile: profileMap.get(review.user_id) ?? { display_name: null },
+      }));
+
+      setReviews(enriched);
+
+      const mine = user ? enriched.find((review) => review.user_id === user.id) ?? null : null;
+      setExistingReview(mine);
+      setRating(mine?.rating ?? 0);
+      setComment(mine?.comment ?? "");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const userIds = [...new Set(data.map((review) => review.user_id))];
-    const profilesResult = userIds.length
-      ? await supabase.from("profiles").select("user_id, display_name").in("user_id", userIds)
-      : { data: [] as Array<{ user_id: string; display_name: string | null }> };
-
-    const profileMap = new Map<string, { display_name: string | null }>(
-      (profilesResult.data ?? []).map(
-        (profile): [string, { display_name: string | null }] => [
-          profile.user_id,
-          { display_name: profile.display_name },
-        ]
-      )
-    );
-
-    const enriched: Review[] = data.map((review) => ({
-      ...review,
-      profile: profileMap.get(review.user_id) ?? { display_name: null },
-    }));
-
-    setReviews(enriched);
-
-    const mine = user ? enriched.find((review) => review.user_id === user.id) ?? null : null;
-    setExistingReview(mine);
-    setRating(mine?.rating ?? 0);
-    setComment(mine?.comment ?? "");
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -153,15 +168,37 @@ export function ReviewSection({ roomId }: { roomId: string }) {
     fetchReviews();
   }, [roomId, user]);
 
+  const withTimeout = async <T,>(promiseFactory: () => Promise<T>, ms = 12000): Promise<T> => {
+    let timeoutId: number | undefined;
+
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutId = window.setTimeout(() => {
+        reject(new Error("Request timed out. Please try again."));
+      }, ms);
+    });
+
+    try {
+      return await Promise.race([promiseFactory(), timeoutPromise]);
+    } finally {
+      if (timeoutId !== undefined) {
+        window.clearTimeout(timeoutId);
+      }
+    }
+  };
+
   const handleSubmit = async () => {
-    if (!user) {
-      toast.error("Please sign in to leave a review");
+    if (!user || submitting) {
+      if (!user) {
+        toast.error("Please sign in to leave a review");
+      }
       return;
     }
+
     if (rating === 0) {
       toast.error("Please select a rating");
       return;
     }
+
     const trimmed = comment.trim();
     if (trimmed.length > 500) {
       toast.error("Review must be under 500 characters");
@@ -169,51 +206,72 @@ export function ReviewSection({ roomId }: { roomId: string }) {
     }
 
     setSubmitting(true);
-    console.log("Starting review submit. existingReview:", existingReview, "roomId:", roomId, "userId:", user.id, "rating:", rating);
+    console.log("Starting review submit", {
+      existingReviewId: existingReview?.id ?? null,
+      roomId,
+      userId: user.id,
+      rating,
+      comment: trimmed || null,
+    });
 
     try {
       if (existingReview) {
-        console.log("Updating existing review:", existingReview.id);
-        const { error, data } = await supabase
-          .from("reviews")
-          .update({ rating, comment: trimmed || null })
-          .eq("id", existingReview.id)
-          .select();
-        console.log("Update result:", { error, data });
-        if (error) {
-          toast.error("Failed to update: " + error.message);
-        } else {
-          toast.success("Review updated!");
-          await fetchReviews();
+        const response = await withTimeout(async () =>
+          await supabase
+            .from("reviews")
+            .update({ rating, comment: trimmed || null })
+            .eq("id", existingReview.id)
+            .select()
+        );
+
+        console.log("Review update response:", response);
+
+        if (response.error) {
+          toast.error("Failed to update review: " + response.error.message);
+          return;
         }
-      } else {
-        console.log("Inserting new review");
-        const { error, data } = await supabase.from("reviews").insert({
-          room_id: roomId,
-          user_id: user.id,
-          rating,
-          comment: trimmed || null,
-        }).select();
-        console.log("Insert result:", { error, data });
-        if (error) {
-          if (error.code === "23505") {
-            toast.error("You've already reviewed this room");
-            await fetchReviews();
-          } else {
-            toast.error("Failed to submit: " + error.message);
-          }
-        } else {
-          toast.success("Review submitted!");
-          setRating(0);
-          setComment("");
-          await fetchReviews();
-        }
+
+        toast.success("Review updated!");
+        await fetchReviews();
+        return;
       }
+
+      const response = await withTimeout(async () =>
+        await supabase
+          .from("reviews")
+          .insert({
+            room_id: roomId,
+            user_id: user.id,
+            rating,
+            comment: trimmed || null,
+          })
+          .select()
+      );
+
+      console.log("Review insert response:", response);
+
+      if (response.error) {
+        if (response.error.code === "23505") {
+          toast.error("You've already reviewed this room");
+          await fetchReviews();
+          return;
+        }
+
+        toast.error("Failed to submit review: " + response.error.message);
+        return;
+      }
+
+      toast.success("Review submitted!");
+      setRating(0);
+      setComment("");
+      setExistingReview(null);
+      await fetchReviews();
     } catch (err) {
-      console.error("Unexpected review error:", err);
-      toast.error("Something went wrong. Please try again.");
+      console.error("Review submission failed:", err);
+      const message = err instanceof Error ? err.message : "Something went wrong. Please try again.";
+      toast.error(message);
     } finally {
-      console.log("Submit complete, resetting submitting state");
+      console.log("Review submit finished");
       setSubmitting(false);
     }
   };

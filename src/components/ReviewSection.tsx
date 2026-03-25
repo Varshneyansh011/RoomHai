@@ -166,12 +166,13 @@ export function ReviewSection({ roomId }: { roomId: string }) {
       }
     } else {
       const { error } = await supabase.from("reviews").insert({
-        room_id: roomId as any,
+        room_id: roomId,
         user_id: user.id,
         rating,
         comment: trimmed || null,
       });
       if (error) {
+        console.error("Review insert error:", error);
         if (error.code === "23505") {
           toast.error("You've already reviewed this room");
         } else {

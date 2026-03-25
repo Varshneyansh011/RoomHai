@@ -4,21 +4,26 @@ import { Footer } from "@/components/Footer";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { Button } from "@/components/ui/button";
 import { facilities as allFacilities, cities } from "@/data/rooms";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Crown, User } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+
+type PlanType = "normal" | "premium" | null;
 
 const BecomeProvider = () => {
   const { user } = useAuth();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [planType, setPlanType] = useState<PlanType>(null);
   const [selectedPlan, setSelectedPlan] = useState("");
-  const plans = [
+
+  const premiumPlans = [
     { id: "1month", label: "1 Month", price: 29 },
     { id: "3months", label: "3 Months", price: 59 },
     { id: "1year", label: "1 Year", price: 99 },
   ];
+
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -44,8 +49,12 @@ const BecomeProvider = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.phone || !form.roomName || !form.city || !form.price || !selectedPlan) {
+    if (!form.name || !form.phone || !form.roomName || !form.city || !form.price) {
       toast.error("Please fill in all required fields");
+      return;
+    }
+    if (planType === "premium" && !selectedPlan) {
+      toast.error("Please select a subscription plan");
       return;
     }
     setLoading(true);
@@ -83,11 +92,83 @@ const BecomeProvider = () => {
             </div>
             <h1 className="text-2xl font-bold mb-3">Submission Received!</h1>
             <p className="text-muted-foreground mb-8">
-              Your room listing has been submitted and is pending approval. Our team will review it and get back to you shortly.
+              Your {planType === "premium" ? "premium" : "normal"} room listing has been submitted and is pending approval.
             </p>
-            <Button onClick={() => setSubmitted(false)} variant="outline">
+            <Button onClick={() => { setSubmitted(false); setPlanType(null); }} variant="outline">
               Submit Another Listing
             </Button>
+          </ScrollReveal>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Plan selection screen
+  if (!planType) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="pt-20 pb-24 max-w-3xl mx-auto section-padding">
+          <ScrollReveal>
+            <h1 className="text-3xl font-bold mb-2 text-center">Become a Room Provider</h1>
+            <p className="text-muted-foreground mb-10 text-center">
+              Choose a plan that suits your needs and start listing your rooms on ROOM HAI.
+            </p>
+          </ScrollReveal>
+
+          <ScrollReveal delay={100}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {/* Normal Plan */}
+              <button
+                onClick={() => setPlanType("normal")}
+                className="group relative rounded-2xl border-2 border-border bg-card p-8 text-left transition-all duration-300 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5"
+              >
+                <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mb-5">
+                  <User className="h-6 w-6 text-foreground" />
+                </div>
+                <h2 className="text-xl font-bold mb-2">Normal Plan</h2>
+                <p className="text-2xl font-bold text-primary mb-3">Free</p>
+                <p className="text-sm text-muted-foreground mb-6">
+                  List your room for free with basic visibility. Great for getting started.
+                </p>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success shrink-0" /> Basic room listing</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success shrink-0" /> Standard visibility</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success shrink-0" /> Contact details shown</li>
+                </ul>
+                <div className="mt-6 w-full h-11 rounded-lg bg-secondary text-foreground font-semibold flex items-center justify-center text-sm group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                  Get Started Free
+                </div>
+              </button>
+
+              {/* Premium Plan */}
+              <button
+                onClick={() => setPlanType("premium")}
+                className="group relative rounded-2xl border-2 border-accent bg-card p-8 text-left transition-all duration-300 hover:shadow-xl hover:shadow-accent/10"
+              >
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground text-xs font-bold px-3 py-1 rounded-full">
+                  RECOMMENDED
+                </span>
+                <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-5">
+                  <Crown className="h-6 w-6 text-accent" />
+                </div>
+                <h2 className="text-xl font-bold mb-2">Premium Plan</h2>
+                <p className="text-2xl font-bold text-accent mb-3">Starting ₹29</p>
+                <p className="text-sm text-muted-foreground mb-6">
+                  Boost your listing with premium features and priority placement.
+                </p>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success shrink-0" /> Priority listing placement</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success shrink-0" /> Featured badge on listing</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success shrink-0" /> Enhanced visibility</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success shrink-0" /> Priority support</li>
+                </ul>
+                <div className="mt-6 w-full h-11 rounded-lg bg-accent text-accent-foreground font-semibold flex items-center justify-center text-sm group-hover:brightness-110 transition-all">
+                  Go Premium
+                </div>
+              </button>
+            </div>
           </ScrollReveal>
         </div>
         <Footer />
@@ -100,9 +181,14 @@ const BecomeProvider = () => {
       <Navbar />
       <div className="pt-20 pb-24 max-w-2xl mx-auto section-padding">
         <ScrollReveal>
-          <h1 className="text-3xl font-bold mb-2">Become a Room Provider</h1>
+          <button onClick={() => setPlanType(null)} className="text-sm text-muted-foreground hover:text-foreground mb-4 inline-flex items-center gap-1 transition-colors">
+            ← Back to plans
+          </button>
+          <h1 className="text-3xl font-bold mb-2">
+            {planType === "premium" ? "Premium Provider Listing" : "Normal Provider Listing"}
+          </h1>
           <p className="text-muted-foreground mb-10">
-            List your room or PG on ROOM HAI and connect with thousands of tenants.
+            Fill in the details below to list your room on ROOM HAI.
           </p>
         </ScrollReveal>
 
@@ -165,31 +251,36 @@ const BecomeProvider = () => {
               </div>
             </div>
 
-            <div className="bg-card rounded-2xl border border-border p-6">
-              <h2 className="font-semibold mb-4">Choose a Subscription Plan *</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {plans.map((plan) => (
-                  <button
-                    key={plan.id}
-                    type="button"
-                    onClick={() => setSelectedPlan(plan.id)}
-                    className={`relative rounded-xl border-2 p-5 text-center transition-all duration-200 ${
-                      selectedPlan === plan.id
-                        ? "border-primary bg-primary/5 shadow-md shadow-primary/10"
-                        : "border-border bg-background hover:border-primary/40"
-                    }`}
-                  >
-                    {plan.id === "1year" && (
-                      <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground text-[10px] font-bold px-2.5 py-0.5 rounded-full">
-                        BEST VALUE
-                      </span>
-                    )}
-                    <div className="text-sm font-medium text-muted-foreground mb-1">{plan.label}</div>
-                    <div className="text-2xl font-bold">₹{plan.price}</div>
-                  </button>
-                ))}
+            {planType === "premium" && (
+              <div className="bg-card rounded-2xl border border-accent/50 p-6">
+                <h2 className="font-semibold mb-4 flex items-center gap-2">
+                  <Crown className="h-5 w-5 text-accent" />
+                  Choose a Subscription Plan *
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {premiumPlans.map((plan) => (
+                    <button
+                      key={plan.id}
+                      type="button"
+                      onClick={() => setSelectedPlan(plan.id)}
+                      className={`relative rounded-xl border-2 p-5 text-center transition-all duration-200 ${
+                        selectedPlan === plan.id
+                          ? "border-accent bg-accent/5 shadow-md shadow-accent/10"
+                          : "border-border bg-background hover:border-accent/40"
+                      }`}
+                    >
+                      {plan.id === "1year" && (
+                        <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+                          BEST VALUE
+                        </span>
+                      )}
+                      <div className="text-sm font-medium text-muted-foreground mb-1">{plan.label}</div>
+                      <div className="text-2xl font-bold">₹{plan.price}</div>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             <Button type="submit" variant="hero" size="xl" className="w-full" disabled={loading}>
               {loading ? "Submitting..." : "Submit Listing for Review"}

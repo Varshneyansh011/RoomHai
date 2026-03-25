@@ -169,29 +169,33 @@ export function ReviewSection({ roomId }: { roomId: string }) {
     }
 
     setSubmitting(true);
+    console.log("Starting review submit. existingReview:", existingReview, "roomId:", roomId, "userId:", user.id, "rating:", rating);
 
     try {
       if (existingReview) {
-        const { error } = await supabase
+        console.log("Updating existing review:", existingReview.id);
+        const { error, data } = await supabase
           .from("reviews")
           .update({ rating, comment: trimmed || null })
-          .eq("id", existingReview.id);
+          .eq("id", existingReview.id)
+          .select();
+        console.log("Update result:", { error, data });
         if (error) {
-          console.error("Review update error:", error);
           toast.error("Failed to update: " + error.message);
         } else {
           toast.success("Review updated!");
           await fetchReviews();
         }
       } else {
-        const { error } = await supabase.from("reviews").insert({
+        console.log("Inserting new review");
+        const { error, data } = await supabase.from("reviews").insert({
           room_id: roomId,
           user_id: user.id,
           rating,
           comment: trimmed || null,
-        });
+        }).select();
+        console.log("Insert result:", { error, data });
         if (error) {
-          console.error("Review insert error:", error);
           if (error.code === "23505") {
             toast.error("You've already reviewed this room");
             await fetchReviews();
@@ -209,6 +213,7 @@ export function ReviewSection({ roomId }: { roomId: string }) {
       console.error("Unexpected review error:", err);
       toast.error("Something went wrong. Please try again.");
     } finally {
+      console.log("Submit complete, resetting submitting state");
       setSubmitting(false);
     }
   };

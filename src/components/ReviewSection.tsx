@@ -159,7 +159,7 @@ export function ReviewSection({ roomId }: { roomId: string }) {
         .update({ rating, comment: trimmed || null })
         .eq("id", existingReview.id);
       if (error) {
-        toast.error("Failed to update review");
+        console.error("Review update error:", error);
       } else {
         toast.success("Review updated!");
         fetchReviews();

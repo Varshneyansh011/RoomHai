@@ -168,8 +168,8 @@ export function ReviewSection({ roomId }: { roomId: string }) {
     fetchReviews();
   }, [roomId, user]);
 
-  const withTimeout = async <T,>(promise: Promise<T>, ms = 12000): Promise<T> => {
-    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const withTimeout = async <T,>(promiseFactory: () => Promise<T>, ms = 12000): Promise<T> => {
+    let timeoutId: number | undefined;
 
     const timeoutPromise = new Promise<never>((_, reject) => {
       timeoutId = window.setTimeout(() => {
@@ -178,9 +178,9 @@ export function ReviewSection({ roomId }: { roomId: string }) {
     });
 
     try {
-      return await Promise.race([promise, timeoutPromise]);
+      return await Promise.race([promiseFactory(), timeoutPromise]);
     } finally {
-      if (timeoutId) {
+      if (timeoutId !== undefined) {
         window.clearTimeout(timeoutId);
       }
     }
@@ -216,7 +216,7 @@ export function ReviewSection({ roomId }: { roomId: string }) {
 
     try {
       if (existingReview) {
-        const response = await withTimeout(
+        const response = await withTimeout(() =>
           supabase
             .from("reviews")
             .update({ rating, comment: trimmed || null })
@@ -236,7 +236,7 @@ export function ReviewSection({ roomId }: { roomId: string }) {
         return;
       }
 
-      const response = await withTimeout(
+      const response = await withTimeout(() =>
         supabase
           .from("reviews")
           .insert({

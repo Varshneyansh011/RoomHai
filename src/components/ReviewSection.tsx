@@ -216,8 +216,8 @@ export function ReviewSection({ roomId }: { roomId: string }) {
 
     try {
       if (existingReview) {
-        const response = await withTimeout(() =>
-          supabase
+        const response = await withTimeout(async () =>
+          await supabase
             .from("reviews")
             .update({ rating, comment: trimmed || null })
             .eq("id", existingReview.id)
@@ -236,8 +236,8 @@ export function ReviewSection({ roomId }: { roomId: string }) {
         return;
       }
 
-      const response = await withTimeout(() =>
-        supabase
+      const response = await withTimeout(async () =>
+        await supabase
           .from("reviews")
           .insert({
             room_id: roomId,
